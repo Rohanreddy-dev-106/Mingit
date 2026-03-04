@@ -4,7 +4,7 @@
   "description": "my own virsion control system in javascript(nodejs)",
   "license": "ISC",
   "author": "Rohan reddy",
-  "type": "commonjs",
+  "type": "module",
   "main": "mingit.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
