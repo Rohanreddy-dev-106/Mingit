@@ -1,0 +1,12 @@
+{
+  "name": "mingit",
+  "version": "1.0.0",
+  "description": "my own virsion control system in javascript(nodejs)",
+  "license": "ISC",
+  "author": "Rohan reddy",
+  "type": "commonjs",
+  "main": "mingit.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
