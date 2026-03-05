@@ -1,9 +1,8 @@
-/** @format */
-
 import path from "path";
 import fs from "fs/promises"; //fs sub module
 import crypto from "crypto";
-
+import chalk from 'chalk';
+import { diffLines } from "diff";
 class Mingit {
   //class varibles
   _repopath;
@@ -111,16 +110,89 @@ class Mingit {
       console.log(`Message: ${Log.Message}`);
       console.log();
 
-      currentcommithash = Log.ParentCommit;
+      currentcommithash = Log.ParentCommit;//Head->nextfile->nextfile(true)->null(false)
     }
   }
+  async showCommitdiff(commethash) {
+    let commitData = JSON.parse(await this.getcommetdata(commethash));
+    if (!commitData) {
+      console.log("commit is not found..");
+      return;
+    }
+
+    console.log("chenges in the last commit are:");
+
+    for (let file of commitData.files) {
+      console.log(`File: ${file.path}`);
+
+      let currentcontent = await this.getFilecontent(file.hash);
+
+      if (commitData.ParentCommit) {
+        let parentcontent = await this.getParentFilecontent(commitData.ParentCommit, file.path);
+
+        if (parentcontent) {
+          let oldlines = parentcontent
+          let newlines = currentcontent
+          const diff = diffLines(oldlines, newlines)
+
+
+          diff.forEach(part => {
+            if (part.added) {
+              process.stdout.write(chalk.green('+ ' + part.value));
+            } else if (part.removed) {
+              process.stdout.write(chalk.red('- ' + part.value));
+            } else {
+              process.stdout.write(chalk.gray('  ' + part.value));
+            }
+          });
+
+        } else {
+          console.log("new file");
+          console.log(`present_content -> ${currentcontent}`);
+        }
+
+      } else {
+        console.log("first commit");
+        console.log(`present_content -> ${currentcontent}`);
+      }
+    }
+  }
+
+  async getParentFilecontent(parentcommithash, filepath) {
+    let parentData = JSON.parse(await this.getcommetdata(parentcommithash));
+    let parentfile = parentData.files.find((f) => {
+      return f.path === filepath;
+    });
+    if (!parentfile) {
+      return null;
+    }
+    else {
+      return await this.getFilecontent(parentfile.hash);
+    }
+  }
+
+  async getcommetdata(currenthash) {
+    let commetpath = path.join(this._objectspath, currenthash);
+    try {
+      return await fs.readFile(commetpath, { encoding: "utf-8" });
+    } catch (error) {
+      console.log(`Failed to Fetch commit ${error.message}`);
+      return null;
+    }
+  }
+
+  async getFilecontent(hash) {
+    let objpath = path.join(this._objectspath, hash);
+    return await fs.readFile(objpath, { encoding: "utf-8" });
+  }
 }
-  //init → add → updateStagingArea → commit → log
-  const mingit = new Mingit();
+//init → add → updateStagingArea → commit → log
+const mingit = new Mingit();
 
 (async () => {
   //await mingit.init();
-  //await mingit.add("sample.txt");
-  //await mingit.commit("init-3-commit");
-  await mingit.logs();
+  // await mingit.add("sample.txt");
+  //await mingit.commit("init-2-commit");
+  // await mingit.logs();
+  await mingit.showCommitdiff("b9da57e94e61fed5ffe47756244bb9c895cee8b1")
 })();

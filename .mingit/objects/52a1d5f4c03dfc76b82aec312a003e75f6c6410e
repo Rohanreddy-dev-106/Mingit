@@ -1,0 +1,11 @@
+{
+  "time": "2026-03-05T09:35:14.312Z",
+  "Message": "init-1-commit",
+  "files": [
+    {
+      "path": "sample.txt",
+      "hash": "95c01108431c3877ea96617868e1e7abe869d4dc"
+    }
+  ],
+  "ParentCommit": ""
+}
