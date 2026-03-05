@@ -1,3 +1,6 @@
+/* The Mingit class in the provided JavaScript code implements basic version control functionalities
+like initializing a repository, adding files, committing changes, and displaying commit history and
+differences. */
 import path from "path";
 import fs from "fs/promises"; //fs sub module
 import crypto from "crypto";
